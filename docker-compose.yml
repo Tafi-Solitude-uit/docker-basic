@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: webapp
+    restart: always
+    image: web-app
+    environment:
+      DEBUG: False
+      POSTGRES_DB: db
+      DATABASE_PORT: 5432
+      POSTGRES_USER: anhtaiht
+      POSTGRES_PASS: 123
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    command: >
+      sh -c "python3 ./create_db.py &&
+            gunicorn -w 2 -b :8080 app:app"
+
+  postgres:
+    container_name: db
+    restart: always
+    image: postgres:latest
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=anhtaiht
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=db
+    expose:
+      - "5432"
+
+volumes:
+  db_data:
